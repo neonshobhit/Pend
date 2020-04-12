@@ -20,12 +20,13 @@ class Main extends StatelessWidget {
       home: HomePage(
         title: "Dance Monkey",
         contentOfText: "They say oh my god I see the way you shine \nTake your hand, my dear, and place them both in mine \n You know you stopped me dead while I was passing by \n And now I beg to see you dance just one more time",
-        author: "Shobhit",
+        author: "Shobhit Maheshwari",
         following: true,
-        drumRolls: 20,
+        cake: true,
         commentsOfText: "List", // list 
         readersChoice: true,
-        bookmarked: false,
+        bookmarked: true,
+        date: "12/12/12",
       ),
     );
   }

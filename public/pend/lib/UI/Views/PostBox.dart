@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 Widget postBox(conx, width) {
-  BuildContext context = conx;
   return Container(
     alignment: Alignment.topCenter,
     child: Card(
@@ -22,19 +21,14 @@ Widget postBox(conx, width) {
               child: TextField(
                 maxLines: null,
                 showCursor: true,
-                smartDashesType: SmartDashesType.enabled,//What does this mean?
+                smartDashesType: SmartDashesType.enabled, //What does this mean?
                 smartQuotesType: SmartQuotesType.enabled, // this too
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(
-                        100.0,
-                      )
-                    ),
-                    borderSide: BorderSide(
-                      color: Colors.white10,
-                      width: 3.0
-                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(
+                      100.0,
+                    )),
+                    borderSide: BorderSide(color: Colors.white10, width: 3.0),
                   ),
                   alignLabelWithHint: true, //what does this mean?
                   hintText: "Sounds good...Write it down!",
@@ -42,14 +36,22 @@ Widget postBox(conx, width) {
                   labelText: "Write...",
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    borderSide: BorderSide(
-                      color: Colors.blue
-                    ),
+                    borderSide: BorderSide(color: Colors.blue),
                   ),
                 ),
                 autofocus: false,
               ),
             ),
+            ListTile(
+              trailing: RaisedButton(
+                child: Text(
+                  "Submit",
+                ),
+                onPressed: () {
+
+                },
+              ),
+            )
           ],
         ),
       ),

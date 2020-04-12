@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pend/UI/Views/AppBar.dart';
 import 'package:pend/UI/Views/Comments.dart';
-import 'package:pend/UI/Views/Content.dart';
 import 'package:pend/UI/Views/PostBox.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,10 +8,11 @@ class HomePage extends StatefulWidget {
   final contentOfText;
   final author;
   final following;
-  final drumRolls;
+  final cake;
   final commentsOfText;
   final readersChoice;
   final bookmarked;
+  final date;
 
   HomePage({
     Key key,
@@ -20,23 +20,25 @@ class HomePage extends StatefulWidget {
     @required this.contentOfText,
     @required this.author,
     @required this.following,
-    @required this.drumRolls,
+    @required this.cake,
     @required this.commentsOfText,
     @required this.readersChoice,
     @required this.bookmarked,
+    @required this.date,
   }) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState(
-    title: title,
-    contentOfText: contentOfText,
-    author: author,
-    following: following,
-    drumRolls: drumRolls,
-    commentsofText: commentsOfText,
-    readersChoice: readersChoice,
-    bookmarked: bookmarked
-   );
+        title: title,
+        contentOfText: contentOfText,
+        author: author,
+        following: following,
+        cake: cake,
+        commentsofText: commentsOfText,
+        readersChoice: readersChoice,
+        bookmarked: bookmarked,
+        date: date,
+      );
 }
 
 class _HomePageState extends State<HomePage> {
@@ -44,10 +46,11 @@ class _HomePageState extends State<HomePage> {
   final contentOfText;
   final author;
   final following;
-  final drumRolls;
+  final cake;
   final commentsofText;
   final readersChoice;
   final bookmarked;
+  final date;
 
   _HomePageState({
     Key key,
@@ -55,14 +58,17 @@ class _HomePageState extends State<HomePage> {
     @required this.contentOfText,
     @required this.author,
     @required this.following,
-    @required this.drumRolls,
+    @required this.cake,
     @required this.commentsofText,
     @required this.readersChoice,
     @required this.bookmarked,
+    @required this.date,
   });
 
   var data;
   var book;
+  var like;
+  var follow;
 
   @override
   void initState() {
@@ -70,6 +76,8 @@ class _HomePageState extends State<HomePage> {
 
     super.initState();
     book = bookmarked;
+    like = cake;
+    follow = following;
   }
 
   @override
@@ -93,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             );
-            
+
             if (details) {
               return Row(
                 children: <Widget>[
@@ -147,31 +155,44 @@ class _HomePageState extends State<HomePage> {
   }
 
   fillData() {
-    return  {
+    return {
       "title": title,
       "contents": contentOfText,
       "author": author,
       "following": following,
-      "drumRolls": drumRolls,
+      "cake": cake,
       "comments": commentsofText,
       "readersChoice": readersChoice,
       "bookmarked": bookmarked,
+      "date": date,
     };
   }
 
-
-
   Widget content(conx, width, data) {
-  double size = MediaQuery.of(conx).size.width * 0.11;
+    double size = MediaQuery.of(conx).size.width * 0.11;
 
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Card(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: SizedBox(
         width: width,
         // height: MediaQuery.of(conx).size.height *(4/5) ,
         child: Column(
           children: <Widget>[
+            data["readersChoice"]
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      trailing: Tooltip(
+                        message: "Readers' Choice",
+                        child: Icon(
+                          Icons.star,
+                          color: Colors.blue,
+                          size: size / 4,
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
             Text(
               data["title"] ?? "Title",
               textAlign: TextAlign.center,
@@ -181,43 +202,118 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             ListTile(
-              leading: IconButton(
-                icon: Icon(
-                  Icons.bookmark,
+              leading: Tooltip(
+                message: "Bookmark",
+                child: IconButton(
+                  icon: Icon(
+                    Icons.bookmark,
+                  ),
+                  color: book ? Colors.white : Colors.blue,
+                  iconSize: size / 3,
+                  onPressed: () {
+                    setState(() {
+                      book = !book;
+                    });
+                  },
                 ),
-                color: book ? Colors.white : Colors.blue,
-                iconSize: size / 3,
-                onPressed: () {
-                  setState(() {
-                    book = !book;
-                  });
-                  
-                },
               ),
-              trailing: Text(
-                data["author"],
-                style: TextStyle(
-                  fontSize: size/8,
+              trailing: Container(
+                margin: EdgeInsets.all(5.0),
+                padding: EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: follow ? Colors.red : Colors.transparent,
+                  ),
+                  borderRadius: BorderRadius.circular(100.0),
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      follow = !follow;
+                    });
+                  },
+                  child: Tooltip(
+                    message: follow ? "Following!" :"Click to follow!",
+                    child: Text(
+                      data["author"],
+                      style: TextStyle(
+                        fontSize: size / 7.5,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 32.0),
+              padding: const EdgeInsets.fromLTRB(8.0, 32.0, 8.0, 32.0),
               child: Text(
                 data["contents"],
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: size / 4, fontFamily: "Ubuntu"),
+                style: TextStyle(
+                  fontSize: size / 4,
+                  fontFamily: "Ubuntu",
+                ),
               ),
             ),
-
-
+            ListTile(
+              leading: Text(
+                data["date"],
+                style: TextStyle(
+                  fontSize: size / 8,
+                  fontFamily: "Ubuntu",
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 5,
+              width: size,
+              child: Center(
+                child: Container(
+                  margin: EdgeInsetsDirectional.only(start: 1.0, end: 1.0),
+                  height: 2,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Tooltip(
+              message: like ? ":(" :"Gift a cake!",
+              child: IconButton(
+                icon: Icon(Icons.cake),
+                iconSize: size / 4,
+                color: like ? Colors.blue : Colors.white,
+                onPressed: () {
+                  setState(() {
+                    like = !like;
+                  });
+                },
+              ),
+            ),
+            SizedBox(
+              height: 5,
+              width: size,
+              child: Center(
+                child: Container(
+                  margin: EdgeInsetsDirectional.only(start: 1.0, end: 1.0),
+                  height: 2,
+                  color: Colors.white,
+                ),
+              ),
+            )
           ],
         ),
       ),
-    ),
-  );
-
-
-
+    );
+  }
 }
-}
+// IconButton(
+//                     icon: Icon(
+//                       Icons.add_alert,
+//                     ),
+//                     iconSize: size / 4,
+//                     color: follow ? Colors.red : Colors.grey,
+//                     onPressed: () {
+//                       setState(() {
+//                         follow = !follow;
+//                       });
+//                     },
+//                   ),

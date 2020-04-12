@@ -21,27 +21,37 @@ Widget appBar(conx) {
 menuItem(conx) {
   return PopupMenuButton(
     tooltip: "Account",
-    icon: Icon(Icons.person),
+    icon: Icon(
+      Icons.person,
+    ),
     offset: Offset.zero,
     itemBuilder: (conx) {
       var list = List<PopupMenuEntry<Object>>();
+      int x = 1;
+      popupMenuItem(thatIcon, thatString, thatCallback) => PopupMenuItem(
+            child: ListTile(
+              leading: IconButton(
+                icon: Icon(
+                  thatIcon,
+                ),
+                onPressed: thatCallback,
+              ),
+              title: Text(
+                thatString,
+              ),
+            ),
+            value: x++,
+          );
+      list.add(
+        popupMenuItem(Icons.home, "Profile", () {}),
+      );
 
       list.add(
-        PopupMenuItem(
-          child: ListTile(
-            leading: IconButton(
-              icon: Icon(
-                Icons.home,
-              ),
-              onPressed: () {},
-            ),
-            title: Text(
-              "Profile",
-            ),
-          ),
+        popupMenuItem(Icons.collections_bookmark, "Bookmarks", () {}),
+      );
 
-          value: 1,
-        ),
+      list.add(
+        popupMenuItem(Icons.time_to_leave, "Time to leave", () {}),
       );
 
       return list;
