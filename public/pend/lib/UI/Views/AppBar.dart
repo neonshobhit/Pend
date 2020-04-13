@@ -10,9 +10,6 @@ Widget appBar(conx) {
       Padding(
         padding: const EdgeInsets.only(right: 40.0),
         child: menuItem(conx),
-        // onPressed: () {
-        //   menuItem(conx);
-        // },
       )
     ],
   );

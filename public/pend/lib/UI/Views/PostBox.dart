@@ -25,9 +25,9 @@ Widget postBox(conx, width) {
                 smartQuotesType: SmartQuotesType.enabled, // this too
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(
-                      100.0,
-                    )),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(100.0),
+                    ),
                     borderSide: BorderSide(color: Colors.white10, width: 3.0),
                   ),
                   alignLabelWithHint: true, //what does this mean?
@@ -43,13 +43,18 @@ Widget postBox(conx, width) {
               ),
             ),
             ListTile(
+              leading: IconButton(
+                icon: Icon(
+                  Icons.photo_camera,
+                ),
+                color: Colors.white,
+                onPressed: () {},
+              ),
               trailing: RaisedButton(
                 child: Text(
                   "Submit",
                 ),
-                onPressed: () {
-
-                },
+                onPressed: () {},
               ),
             )
           ],

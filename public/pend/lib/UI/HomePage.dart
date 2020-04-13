@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pend/Network/ListOfData.dart';
 import 'package:pend/UI/Views/AppBar.dart';
 import 'package:pend/UI/Views/Comments.dart';
 import 'package:pend/UI/Views/PostBox.dart';
+import 'package:stack/stack.dart' as stk;
 
 class HomePage extends StatefulWidget {
   final title;
@@ -42,7 +44,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final title;
+  var title;
   final contentOfText;
   final author;
   final following;
@@ -70,6 +72,11 @@ class _HomePageState extends State<HomePage> {
   var like;
   var follow;
 
+  var listOfContent;
+
+  stk.Stack<String> stack = stk.Stack();
+  String thislink = "";
+
   @override
   void initState() {
     // TODO: implement initState
@@ -78,6 +85,10 @@ class _HomePageState extends State<HomePage> {
     book = bookmarked;
     like = cake;
     follow = following;
+
+    fetchContentList();
+    data = fillData();
+    
   }
 
   @override
@@ -88,15 +99,16 @@ class _HomePageState extends State<HomePage> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             var details = constraints.maxWidth > 1200;
-            data = fillData();
+
             var column = Container(
               alignment: Alignment.topCenter,
               child: SingleChildScrollView(
                 child: Column(
+                  mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
                     postBox(context, calcSize(constraints.maxWidth)),
-                    content(context, calcSize(constraints.maxWidth), data),
-                    comments(context, calcSize(constraints.maxWidth)),
+                    content(context, calcSize(constraints.maxWidth)),
+                    comments(context, calcSize(constraints.maxWidth), data["comments"]),
                   ],
                 ),
               ),
@@ -104,21 +116,38 @@ class _HomePageState extends State<HomePage> {
 
             if (details) {
               return Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Flexible(
-                    flex: 1,
-                    child: Card(
+                  Card(
+                    child: SingleChildScrollView(
                       child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: double.infinity,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                "ListBox",
+                        width: constraints.maxWidth * (1 / 5),
+                        child: ListView.builder(
+                          primary: false,
+                          shrinkWrap: true,
+                          itemCount: listOfContent.length,
+                          itemBuilder: (context, i) {
+                            return Tooltip(
+                              message:
+                                  listOfContent[i]["contents"] ?? "No content",
+                              child: GestureDetector(
+                                onTap: () {
+                                  stack.push(thislink);
+                                  setState(() {
+                                    data = listOfContent[i];
+                                    this.title = listOfContent[i]["title"];
+                                  });
+                                  
+                                },
+                                child: ListTile(
+                                  title: Text(
+                                    listOfContent[i]["title"] ?? "no title",
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -142,7 +171,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      drawer: Drawer(),
+      drawer: null,
     );
   }
 
@@ -155,6 +184,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   fillData() {
+    
     return {
       "title": title,
       "contents": contentOfText,
@@ -166,9 +196,10 @@ class _HomePageState extends State<HomePage> {
       "bookmarked": bookmarked,
       "date": date,
     };
+    
   }
 
-  Widget content(conx, width, data) {
+  Widget content(conx, width) {
     double size = MediaQuery.of(conx).size.width * 0.11;
 
     return Padding(
@@ -182,6 +213,21 @@ class _HomePageState extends State<HomePage> {
                 ? Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListTile(
+                      leading: stack.isNotEmpty
+                          ? Tooltip(
+                              message: "Last content",
+                              child: IconButton(
+                                icon: Icon(Icons.arrow_back),
+                                onPressed: () {
+                                  var cont = stack.pop();
+                                  // stack.push(thislink);
+                                  setState(() {
+                                    data = cont;
+                                  });
+                                },
+                              ),
+                            )
+                          : SizedBox(),
                       trailing: Tooltip(
                         message: "Readers' Choice",
                         child: Icon(
@@ -218,8 +264,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               trailing: Container(
-                margin: EdgeInsets.all(5.0),
-                padding: EdgeInsets.all(10.0),
+                margin: EdgeInsets.all(2.0),
+                padding: EdgeInsets.all(2.0),
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: follow ? Colors.red : Colors.transparent,
@@ -233,12 +279,26 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                   child: Tooltip(
-                    message: follow ? "Following!" :"Click to follow!",
-                    child: Text(
-                      data["author"],
-                      style: TextStyle(
-                        fontSize: size / 7.5,
-                      ),
+                    message: follow ? "Following!" : "Click to follow!",
+                    child: Wrap(
+                      spacing: 0,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            data["author"],
+                            style: TextStyle(
+                              fontSize: size / 7.5,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.add_alert,
+                          ),
+                          onPressed: () {},
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -276,7 +336,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Tooltip(
-              message: like ? ":(" :"Gift a cake!",
+              message: like ? ":(" : "Gift a cake!",
               child: IconButton(
                 icon: Icon(Icons.cake),
                 iconSize: size / 4,
@@ -304,16 +364,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  fetchContentList() {
+    listOfContent = fetchListContents();
+  }
 }
-// IconButton(
-//                     icon: Icon(
-//                       Icons.add_alert,
-//                     ),
-//                     iconSize: size / 4,
-//                     color: follow ? Colors.red : Colors.grey,
-//                     onPressed: () {
-//                       setState(() {
-//                         follow = !follow;
-//                       });
-//                     },
-//                   ),

@@ -23,7 +23,10 @@ class Main extends StatelessWidget {
         author: "Shobhit Maheshwari",
         following: true,
         cake: true,
-        commentsOfText: "List", // list 
+        commentsOfText: [
+          "hello",
+          "world"
+        ], // list 
         readersChoice: true,
         bookmarked: true,
         date: "12/12/12",
