@@ -77,6 +77,8 @@ class _HomePageState extends State<HomePage> {
   stk.Stack<String> stack = stk.Stack();
   String thislink = "";
 
+  bool draw = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -88,91 +90,99 @@ class _HomePageState extends State<HomePage> {
 
     fetchContentList();
     data = fillData();
-    
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: appBar(context),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            var details = constraints.maxWidth > 1200;
-
-            var column = Container(
-              alignment: Alignment.topCenter,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    postBox(context, calcSize(constraints.maxWidth)),
-                    content(context, calcSize(constraints.maxWidth)),
-                    comments(context, calcSize(constraints.maxWidth), data["comments"]),
-                  ],
+    return LayoutBuilder(builder: (c, cons) {
+      if (cons.maxWidth <= 1200)
+        draw = true;
+      else
+        draw = false;
+      var listView = ListView.builder(
+        primary: false,
+        shrinkWrap: true,
+        itemCount: listOfContent.length,
+        itemBuilder: (context, i) {
+          return Tooltip(
+            message: listOfContent[i]["contents"] ?? "No content",
+            child: GestureDetector(
+              onTap: () {
+                stack.push(thislink);
+                setState(() {
+                  data = listOfContent[i];
+                  this.title = listOfContent[i]["title"];
+                });
+              },
+              child: ListTile(
+                title: Text(
+                  listOfContent[i]["title"] ?? "no title",
                 ),
               ),
-            );
+            ),
+          );
+        },
+      );
+      return Scaffold(
+        appBar: appBar(context),
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              var details = constraints.maxWidth > 1200;
 
-            if (details) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Card(
-                    child: SingleChildScrollView(
-                      child: SizedBox(
-                        width: constraints.maxWidth * (1 / 5),
-                        child: ListView.builder(
-                          primary: false,
-                          shrinkWrap: true,
-                          itemCount: listOfContent.length,
-                          itemBuilder: (context, i) {
-                            return Tooltip(
-                              message:
-                                  listOfContent[i]["contents"] ?? "No content",
-                              child: GestureDetector(
-                                onTap: () {
-                                  stack.push(thislink);
-                                  setState(() {
-                                    data = listOfContent[i];
-                                    this.title = listOfContent[i]["title"];
-                                  });
-                                  
-                                },
-                                child: ListTile(
-                                  title: Text(
-                                    listOfContent[i]["title"] ?? "no title",
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+              var column = Container(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      postBox(
+                        conx: context,
+                        width: calcSize(constraints.maxWidth),
+                      ),
+                      content(context, calcSize(constraints.maxWidth)),
+                      comments(context, calcSize(constraints.maxWidth),
+                          data["comments"]),
+                    ],
+                  ),
+                ),
+              );
+
+              if (details) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Card(
+                      child: SingleChildScrollView(
+                        child: SizedBox(
+                          width: constraints.maxWidth * (1 / 5),
+                          child: listView,
                         ),
                       ),
                     ),
-                  ),
-                  column,
-                ],
-              );
-            } else {
-              return column;
-            }
-          },
-        ),
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FloatingActionButton(
-          elevation: 1.0,
-          onPressed: () {},
-          child: Icon(
-            Icons.add,
+                    column,
+                  ],
+                );
+              } else {
+                return column;
+              }
+            },
           ),
         ),
-      ),
-      drawer: null,
-    );
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FloatingActionButton(
+            elevation: 1.0,
+            onPressed: () {},
+            child: Icon(
+              Icons.add,
+            ),
+          ),
+        ),
+        drawer: draw ? Drawer(child: listView) : null,
+      );
+    });
   }
 
   calcSize(width) {
@@ -184,7 +194,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   fillData() {
-    
     return {
       "title": title,
       "contents": contentOfText,
@@ -196,7 +205,6 @@ class _HomePageState extends State<HomePage> {
       "bookmarked": bookmarked,
       "date": date,
     };
-    
   }
 
   Widget content(conx, width) {
@@ -220,7 +228,7 @@ class _HomePageState extends State<HomePage> {
                                 icon: Icon(Icons.arrow_back),
                                 onPressed: () {
                                   var cont = stack.pop();
-                                  // stack.push(thislink);
+
                                   setState(() {
                                     data = cont;
                                   });
