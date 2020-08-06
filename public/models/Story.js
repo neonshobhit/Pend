@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 const slug = require("slugs");
 
-const storeSchema = new mongoose.Schema(
+const storySchema = new mongoose.Schema(
   {
     name: {
       type: String,
       trim: true,
-      required: "Please enter a store name!"
+      required: "Please enter a story name!"
     },
     slug: String,
     description: {
@@ -49,30 +49,29 @@ const storeSchema = new mongoose.Schema(
 );
 
 // Define our indexes
-storeSchema.index({
+storySchema.index({
   name: "text",
   description: "text"
 });
 
-storeSchema.index({ location: "2dsphere" });
+storySchema.index({ location: "2dsphere" });
 
-storeSchema.pre("save", async function(next) {
+storySchema.pre("save", async function(next) {
   if (!this.isModified("name")) {
     next(); // skip it
     return; // stop this function from running
   }
-  this.slug = slug(this.name);
-  // find other stores that have a slug of wes, wes-1, wes-2
+  this.slug = slug(this.name){
   const slugRegEx = new RegExp(`^(${this.slug})((-[0-9]*$)?)$`, "i");
-  const storesWithSlug = await this.constructor.find({ slug: slugRegEx });
-  if (storesWithSlug.length) {
-    this.slug = `${this.slug}-${storesWithSlug.length + 1}`;
+  const storyWithSlug = await this.constructor.find({ slug: slugRegEx });
+  if (storyWithSlug.length) {
+    this.slug = `${this.slug}-${storyWithSlug.length + 1}`;
   }
   next();
   // TODO make more resiliant so slugs are unique
 });
 
-storeSchema.statics.getTagsList = function() {
+storySchema.statics.getTagsList = function() {
   return this.aggregate([
     { $unwind: "$tags" },
     { $group: { _id: "$tags", count: { $sum: 1 } } },
@@ -80,14 +79,14 @@ storeSchema.statics.getTagsList = function() {
   ]);
 };
 
-storeSchema.statics.getTopStores = function() {
+storySchema.statics.getTopStorys = function() {
   return this.aggregate([
-    // Lookup Stores and populate their reviews
+    // Lookup Storys and populate their reviews
     {
       $lookup: {
         from: "reviews",
         localField: "_id",
-        foreignField: "store",
+        foreignField: "story",
         as: "reviews"
       }
     },
@@ -110,11 +109,11 @@ storeSchema.statics.getTopStores = function() {
   ]);
 };
 
-// find reviews where the stores _id property === reviews store property
-storeSchema.virtual("reviews", {
+// find reviews where the story _id property === reviews story property
+storySchema.virtual("reviews", {
   ref: "Review", // what model to link?
-  localField: "_id", // which field on the store?
-  foreignField: "store" // which field on the review?
+  localField: "_id", // which field on the story?
+  foreignField: "story" // which field on the review?
 });
 
 function autopopulate(next) {
@@ -122,7 +121,7 @@ function autopopulate(next) {
   next();
 }
 
-storeSchema.pre("find", autopopulate);
-storeSchema.pre("findOne", autopopulate);
+storySchema.pre("find", autopopulate);
+storySchema.pre("findOne", autopopulate);
 
-module.exports = mongoose.model("Store", storeSchema);
+module.exports = mongoose.model("Story", storySchema);
